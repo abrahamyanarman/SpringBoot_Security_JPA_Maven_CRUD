@@ -41,6 +41,7 @@ public class Users implements UserDetails {
     @Column(name = "active")
     private boolean active;
 
+
     @NotNull
     @NotEmpty
     @Column(name = "userFirstName")
