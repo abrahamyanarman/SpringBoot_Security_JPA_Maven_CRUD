@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<!--<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>-->
+<th:block th:each="users : ${users}">
+    <h1 th:if="${users.userEmail}==${#httpServletRequest.remoteUser}" th:text="'Hello '+${users.userFirstName}+' '+${users.userLastName}+'!'"/>
+</th:block>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+<a href="/second">second</a>
+<div style="margin: 0 auto;width: 601px;padding-bottom: 20px;">
+    <div class="alert alert-primary" role="alert" style="margin: 0;">
+        Add New User
+    </div>
+    <form method="post" th:action="@{/add}">
+
+        <input type="text" class="form-control" name="name" placeholder="write FirstName" />
+        <input type="text" class="form-control" name="sname" placeholder="write LastName" />
+        <input type="email" class="form-control" name="email" placeholder="write Email" />
+        <input type="text" class="form-control" name="userCity" placeholder="write City" />
+        <input type="submit" class="btn btn-success" style="width: 100%!important;" value="ADD"/>
+    </form>
+</div>
+<div style="margin: 0 auto;width: 601px;padding-bottom: 20px;">
+    <div class="alert alert-primary" role="alert" style="margin: 0;">
+        Find From Users
+    </div>
+    <form method="get" action="/main" >
+
+        <input type="text" class="form-control" name="filter" placeholder="write FirstName" />
+
+        <button type="submit" class="btn btn-success" style="width: 100%!important;">Search</button>
+    </form>
+</div>
+<!--Change User Name-->
+<div id="changeName" class="alert alert-info" role="alert" style="display: none;width: 400px;position: fixed;z-index: 1000; margin-left: 40%;">
+    <div class="input-group input-group-lg">
+    <div class="input-group-prepend">
+        <span class="input-group-text" >FirstName</span>
+    </div>
+<input type="text" id="userName" placeholder="UserFirstName"/>
+</div>
+    <div class="input-group input-group-lg">
+        <div class="input-group-prepend">
+            <span class="input-group-text" >LastName</span>
+        </div>
+        <input type="text" id="userSurName" placeholder="UserLastName"/>
+    </div>
+    <button type="button" id="updateName" class="btn btn-secondary"onclick="updateName($('#userName').val(),$('#userSurName').val())">Update</button>
+    <button type="button" id="closeName" class="btn btn-secondary" onclick="$('#changeName').css('display','none')">Close</button>
+</div>
+
+<!--=====================================-->
+<!--Change User Email-->
+<div id="changeEmail" class="alert alert-info" role="alert" style="display: none;width: 400px;position: fixed;z-index: 1000; margin-left: 40%;">
+    <div class="input-group input-group-lg">
+        <div class="input-group-prepend">
+            <span class="input-group-text" >UserEmail</span>
+        </div>
+        <input type="text" id="userEmail" placeholder="UserEmail"/>
+    </div>
+    <button type="button" id="updateEmail" class="btn btn-secondary"onclick="updateEmail($('#userEmail').val())">Update</button>
+    <button type="button" id="closeEmail" class="btn btn-secondary" onclick="$('#changeEmail').css('display','none')">Close</button>
+</div>
+<!--=====================================-->
+<!--Change User Name-->
+<div id="changeCity" class="alert alert-info" role="alert" style="display: none;width: 400px;position: fixed;z-index: 1000; margin-left: 40%;">
+    <div class="input-group input-group-lg">
+        <div class="input-group-prepend">
+            <span class="input-group-text" >City</span>
+        </div>
+        <input type="text" id="userCity" placeholder="UserCity"/>
+    </div>
+
+    <button type="button" id="updateCity" class="btn btn-secondary">Update</button>
+    <button type="button" id="closeCity" class="btn btn-secondary" onclick="$('#changeCity').css('display','none')">Close</button>
+</div>
+<!--=====================================-->
+<div style="margin: 0 auto;padding-top: 20px;width: 600px;">
+    <div class="alert alert-danger" role="alert" style="margin: 0;">
+        Users List
+    </div>
+
+<table border="2" style="width:600px;" class="table table-striped table-dark">
+
+    <tr>
+        <th scope="col">User</th>
+        <th scope="col">City</th>
+        <th scope="col">Email</th>
+    </tr>
+    <!--/*@thymesVar id="users" type="com.example.demo.model.Users"*/-->
+    <tr th:each="users : ${users}" th:id="${users.id}" class="bodyy" >
+
+        <td th:text="${users.userFirstName}+' '+${users.userLastName}" class="name"></td>
+        <td th:text="${users.userCity}" class="city" ></td>
+        <td th:text="${users.userEmail}" class="email"></td>
+        <td class="delete" style="display: none;"><button type="button" class="btn btn-outline-danger">Delete</button></td>
+
+
+    </tr>
+</table>
+</div>
+<script>
+
+    $(document).ready(function() {
+        $("tr").not(':first').hover(function(){$(".delete").css("display", "block")},
+            function(){$(".delete").css("display", "none")});
+        $(".name").click(function () {
+            var id = this.parentNode.id;
+            $("#updateName").click(function () {
+                var token = $("meta[name='_csrf']").attr("content");
+                var header = $("meta[name='_csrf_header']").attr("content");
+                var name = $("#userName").val();
+                var sname = $("#userSurName").val();
+                $.ajax
+                ({
+                    url: '/updatename',
+                    data: {
+                        "userName": name,
+                        "userSurName": sname,
+                        "userId": id
+                    },
+                    type: 'post',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function () {
+                        $("#changeName").css("display", "none");
+                        location.reload();
+                    }
+                });
+            });
+            $("#changeName").css("display", "block");
+        });
+        $(".city").click(function () {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var id = this.parentNode.id;
+            $("#updateCity").click(function () {
+                var city = $("#userCity").val();
+                $.ajax
+                ({
+                    url: '/updatecity',
+                    data: {
+                        "userCity": city,
+                        "userId": id
+                    },
+                    type: 'post',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function () {
+                        $("#changeCity").css("display", "none");
+                        location.reload();
+                    }
+                });
+            });
+            $("#changeCity").css("display", "block");
+        });
+        $(".email").click(function () {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var id = this.parentNode.id;
+            $("#updateEmail").click(function () {
+                var email = $("#userEmail").val();
+                $.ajax
+                ({
+                    url: '/updateEmail',
+                    data: {
+                        "useremail": email,
+                        "userId": id
+                    },
+                    type: 'post',
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function () {
+                        $("#changeEmail").css("display", "none");
+                        location.reload();
+                    }
+                });
+            });
+            $("#changeEmail").css("display", "block");
+        });
+
+        $(".delete").click(function () {
+            var token = $("meta[name='_csrf']").attr("content");
+            var header = $("meta[name='_csrf_header']").attr("content");
+            var id = this.parentNode.id;
+            $.ajax
+            ({
+                type: 'POST',
+                url: '/delete',
+                data: {
+
+                    "userId": id
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(header, token);
+                },
+                success: function () {
+                    $(".delete").css("display", "none");
+                    location.reload();
+                }
+            });
+        });
+    });
+
+</script>
+</body>
+</html>
