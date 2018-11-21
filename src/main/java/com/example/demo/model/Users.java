@@ -13,11 +13,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.sql.Date;
 
-/**
- * Created by Max on 16.07.2017.
- */
+
 @Entity()
 @Table(name = "users")
 @DynamicUpdate()
@@ -41,8 +38,6 @@ public class Users implements UserDetails {
     private String userPassword;
 
 
-
-
     @Column(name = "active")
     private boolean active;
 
@@ -64,6 +59,7 @@ public class Users implements UserDetails {
 
     @Column(name = "userZIP")
     private int userZIP;
+
     @Column(name = "userPhone")
     private String userPhone;
 
