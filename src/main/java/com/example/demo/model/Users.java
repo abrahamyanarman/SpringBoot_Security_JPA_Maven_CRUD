@@ -20,7 +20,7 @@ import java.sql.Date;
  */
 @Entity()
 @Table(name = "users")
-@DynamicUpdate(true)
+@DynamicUpdate()
 public class Users implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
@@ -133,7 +133,6 @@ public class Users implements UserDetails {
     public void setUserFirstName(String userFirstName) {
         this.userFirstName = userFirstName;
     }
-/**/
     public String getUserLastName() {
         return userLastName;
     }
