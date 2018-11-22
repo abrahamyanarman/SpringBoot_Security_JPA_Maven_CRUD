@@ -26,7 +26,12 @@ public class RegistrationController {
     }
 
     @PostMapping("/registration")
-    public String addUser(@RequestParam String userFirstName,@RequestParam String userLastName,@RequestParam String userEmail,@RequestParam String userPassword, Map<String,Object> model)
+    public String addUser(@RequestParam String userFirstName,
+                          @RequestParam String userLastName,
+                          @RequestParam String userEmail,
+                          @RequestParam String userPassword,
+                          @RequestParam String role,
+                          Map<String,Object> model)
     {
 
        Users userFromDb = userRepo.findByUserEmailIs(userEmail);
@@ -40,8 +45,8 @@ public class RegistrationController {
                users.setUserFirstName(userFirstName);
                users.setUserLastName(userLastName);
                users.setUserPassword(userPassword);
+               if (role.equals("Admin")){users.setRoles(Collections.singleton(Role.ADMIN));}else {users.setRoles(Collections.singleton(Role.USER));}
                users.setActive(true);
-               users.setRoles(Collections.singleton(Role.USER));
                userRepo.save(users);
 
            }

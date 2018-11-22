@@ -5,6 +5,7 @@ import com.example.demo.model.Role;
 import com.example.demo.model.Users;
 import com.example.demo.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 
 @Controller
+@PreAuthorize("hasAuthority('ADMIN')")
 public class UserController {
 
     @Autowired
@@ -35,13 +37,15 @@ public class UserController {
         model.addAttribute("users", users);
         return "main";
     }
-    @GetMapping("/login")
-    public String login(){
-        return "login";
-    }
+
 
     @PostMapping("/add")
-    public String add(@RequestParam String userCity, @RequestParam String email,@RequestParam String name, @RequestParam String sname,Model model){
+    public String add(@RequestParam String userCity,
+                      @RequestParam String email,
+                      @RequestParam String name,
+                      @RequestParam String sname,
+                      @RequestParam String role,
+                      Model model){
 
         Users userrr = new Users();
         if (!name.isEmpty() && !sname.isEmpty() && !email.isEmpty() && !userCity.isEmpty()) {
@@ -50,7 +54,8 @@ public class UserController {
             userrr.setUserLastName(sname);
             userrr.setUserCity(userCity);
             userrr.setActive(false);
-            userrr.setRoles(Collections.singleton(Role.USER));
+            if (role.equals("Admin")){userrr.setRoles(Collections.singleton(Role.ADMIN));}else {userrr.setRoles(Collections.singleton(Role.USER));}
+
             userRepo.save(userrr);
         }
       name = null;
@@ -74,29 +79,6 @@ public class UserController {
         return "main";
     }*/
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username,@RequestParam String password, Map<String, Object> model){
-        if (!username.isEmpty() && !password.isEmpty()){
-
-           Users user =  userRepo.findByUserEmailIs(username);
-           if (user == null){
-               model.put("message","user not found please register!");
-               return "redirect:/registration";
-           }
-
-           if (password.equals(user.getUserPassword())){
-               model.put("message","logged on!");
-               return "redirect:/main";
-           }else {
-               model.put("message","login or password is not correct!");
-               return "redirect:/login";
-
-           }
-        }else {
-            model.put("message","username or password is empty please check");
-            return "redirect:/login";
-        }
-    }
 
     @PostMapping("/updatecity")
     public String updateCity(@RequestParam String userCity,@RequestParam String userId,Model model){
